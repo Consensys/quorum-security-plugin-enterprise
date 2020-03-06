@@ -1,0 +1,19 @@
+{
+  "tls": {
+    "auto": true,
+    "certFile": "/tmp/cert.pem",
+    "keyFile": "/tmp/key.pem"
+  },
+  "tokenValidation": {
+    "issuers": [
+      "https://dev-318462.okta.com/oauth2/auszgaza2F3Tlc80i356"
+    ],
+    "jws": {
+      "endpoint": "https://dev-318462.okta.com/oauth2/auszgaza2F3Tlc80i356/v1/keys"
+    },
+    "jwt": {
+      "authorizationField": "scp",
+      "preferIntrospection": false
+    }
+  }
+}

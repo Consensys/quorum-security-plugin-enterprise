@@ -1,0 +1,93 @@
+package internal
+
+import (
+	"context"
+	"fmt"
+	"log"
+	"time"
+
+	"github.com/hashicorp/go-plugin"
+	"github.com/jpmorganchase/quorum-plugin-security/internal/config"
+	"github.com/jpmorganchase/quorum-plugin-security/internal/oauth2"
+	"github.com/jpmorganchase/quorum-plugin-security/internal/tls"
+	"github.com/jpmorganchase/quorum-security-plugin-sdk-go/proto"
+	"github.com/jpmorganchase/quorum-security-plugin-sdk-go/proto_common"
+	"google.golang.org/grpc"
+	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/status"
+)
+
+const DefaultProtocolVersion = 1
+
+var (
+	// this must be identical to handshake config in Quorum Client
+	DefaultHandshakeConfig = plugin.HandshakeConfig{
+		ProtocolVersion:  DefaultProtocolVersion,
+		MagicCookieKey:   "QUORUM_PLUGIN_MAGIC_COOKIE",
+		MagicCookieValue: "CB9F51969613126D93468868990F77A8470EB9177503C5A38D437FEFF7786E0941152E05C06A9A3313391059132A7F9CED86C0783FE63A8B38F01623C8257664",
+	}
+)
+
+// implements all security interfaces and
+// delegating calls to actual implementation
+type SecurityPluginImpl struct {
+	plugin.Plugin
+	config          *config.SecurityConfiguration
+	tlsConfigSource proto.TLSConfigurationSourceServer
+	authManager     proto.AuthenticationManagerServer
+}
+
+// delegate call
+func (p *SecurityPluginImpl) Authenticate(ctx context.Context, req *proto.AuthenticationToken) (*proto.PreAuthenticatedAuthenticationToken, error) {
+	startTime := time.Now()
+	defer func() {
+		log.Println("[DEBUG] authenticate took", time.Now().Sub(startTime).Round(time.Microsecond))
+	}()
+	return p.authManager.Authenticate(ctx, req)
+}
+
+// delegate call
+func (p *SecurityPluginImpl) Get(ctx context.Context, req *proto.TLSConfiguration_Request) (*proto.TLSConfiguration_Response, error) {
+	if p.tlsConfigSource == nil {
+		return nil, status.Error(codes.Unavailable, "no configuration")
+	}
+	return p.tlsConfigSource.Get(ctx, req)
+}
+
+func (p *SecurityPluginImpl) Init(ctx context.Context, req *proto_common.PluginInitialization_Request) (*proto_common.PluginInitialization_Response, error) {
+	startTime := time.Now()
+	defer func() {
+		log.Println("[INFO] plugin initialization took", time.Now().Sub(startTime).Round(time.Microsecond))
+	}()
+	conf, err := config.NewSecurityConfiguration(req.GetRawConfiguration())
+	if err != nil {
+		return nil, status.Errorf(codes.InvalidArgument, err.Error())
+	}
+	p.config = conf
+	p.tlsConfigSource, err = tls.NewTLSConfigurationSource(conf.TLSConfig)
+	if err != nil {
+		return nil, status.Error(codes.InvalidArgument, err.Error())
+	}
+	if req.HostIdentity == "" {
+		return nil, status.Error(codes.InvalidArgument, "missing geth node name")
+	}
+	conf.TokenValidationConfig.Aud = req.HostIdentity
+	p.authManager, err = oauth2.NewManager(conf.TokenValidationConfig)
+	if err != nil {
+		return nil, status.Error(codes.InvalidArgument, err.Error())
+	}
+	return &proto_common.PluginInitialization_Response{}, nil
+}
+
+func (p *SecurityPluginImpl) GRPCServer(b *plugin.GRPCBroker, s *grpc.Server) error {
+	proto_common.RegisterPluginInitializerServer(s, p)
+	log.Println("[INFO] Register AuthenticationManager")
+	proto.RegisterAuthenticationManagerServer(s, p)
+	log.Println("[INFO] Register TLSConfigurationSourceServer")
+	proto.RegisterTLSConfigurationSourceServer(s, p)
+	return nil
+}
+
+func (*SecurityPluginImpl) GRPCClient(context.Context, *plugin.GRPCBroker, *grpc.ClientConn) (interface{}, error) {
+	return nil, fmt.Errorf("not supported")
+}
