@@ -9,7 +9,7 @@ import (
 )
 
 func main() {
-	log.SetFlags(0)     // remove timestamp when logging to host process
+	log.SetFlags(0)          // remove timestamp when logging to host process
 	log.SetOutput(os.Stderr) // host process listens to stderr to log
 	plugin.Serve(&plugin.ServeConfig{
 		HandshakeConfig: internal.DefaultHandshakeConfig,
