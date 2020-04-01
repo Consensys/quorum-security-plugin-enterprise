@@ -1,7 +1,7 @@
 GIT_COMMIT := $(shell git rev-parse HEAD)
 GIT_BRANCH := $(shell git rev-parse --abbrev-ref HEAD)
 GIT_REPO := $(shell git ls-remote --get-url)
-EXECUTABLE := "quorum-plugin-security-manager"
+EXECUTABLE := "quorum-plugin-security"
 OUTPUT_DIR := "$(shell pwd)/build"
 VERSION := "1.0.0"
 LD_FLAGS="-X main.GitCommit=${GIT_COMMIT} -X main.GitBranch=${GIT_BRANCH} -X main.GitRepo=${GIT_REPO} \
@@ -26,16 +26,21 @@ fixfmt: tools
 test: tools
 	@go test ./...
 
-dist:
+dist-local: clean build zip
 	@[ "${PLUGIN_DEST_PATH}" ] || ( echo "Please provide PLUGIN_DEST_PATH env variable" ; exit 1)
 	@mkdir -p ${PLUGIN_DEST_PATH}
 	@cp ${OUTPUT_DIR}/$(shell go env GOOS)-$(shell go env GOARCH)/${EXECUTABLE}-${VERSION}.zip ${PLUGIN_DEST_PATH}/${EXECUTABLE}-${VERSION}.zip
+
+dist: clean build zip
+	@echo Done!
+	@cat ${OUTPUT_DIR}/plugin-meta.json
+	@ls ${OUTPUT_DIR}/*
 
 build: checkfmt
 	@mkdir -p ${OUTPUT_DIR}
 	@echo Output to ${OUTPUT_DIR}
 	@LD_FLAGS=${LD_FLAGS} go generate ./internal/metadata
-	@gox \
+	@CGO_ENABLED=0 gox \
 		-parallel=2 \
 		-os="${XC_OS}" \
 		-arch="${XC_ARCH}" \
