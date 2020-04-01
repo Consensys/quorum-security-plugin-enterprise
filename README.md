@@ -11,7 +11,6 @@ that support both JSON Web Token ([JWT](https://tools.ietf.org/html/rfc7519)) an
 ## Quick Start
 
 ```bash
-$ go mod vendor
 $ make
 $ PLUGIN_DIST_PATH=<path to store plugin distribution zip file> make dist
 ```

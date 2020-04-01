@@ -22,7 +22,6 @@ jobs:
       - name: Build
         id: build
         run: |
-          cd go
           export PATH=$PATH:$(go env GOPATH)/bin
           make dist VERSION=${{ steps.meta.outputs.version_short }}
       - name: Upload artifacts
@@ -32,8 +31,10 @@ jobs:
           name: artifacts
           path: build
   deploy:
-    name: Deploy ${{ matrix.artifact }}/${{ matrix.arch }}/${{ matrix.extension }} to Bintray
+    name: Deploy ${{ matrix.arch }} dist to Bintray
     runs-on: ubuntu-latest
+    needs:
+      - build
     strategy:
       matrix:
         arch: ["linux-amd64", "darwin-amd64"]
@@ -68,7 +69,7 @@ jobs:
       - name: Upload to Bintray
         run: |
           jfrog bt upload --key ${{ secrets.BINTRAY_API_KEY }} --user ${{ secrets.BINTRAY_USER }} --publish --override \
-                "${{ matrix.artifact }}/${{ matrix.arch }}/${{ steps.meta.outputs.package }}-${{ steps.meta.outputs.version_short }}.*" \
+                "artifacts/${{ matrix.arch }}/${{ steps.meta.outputs.package }}-${{ steps.meta.outputs.version_short }}.*" \
                 ${{ secrets.BINTRAY_ORGANIZATION }}/${{ secrets.BINTRAY_REPOSITORY }}/${{ steps.meta.outputs.package }}/${{ steps.meta.outputs.version }} \
                 ${{ steps.meta.outputs.package }}/${{ steps.meta.outputs.version }}/${{ matrix.arch }}/
   notify:
@@ -87,20 +88,18 @@ jobs:
             ////////////////////////////////////
             // retrieve workflow run data
             ////////////////////////////////////
-
             console.log("get workflow run")
             const wf_run = await github.actions.getWorkflowRun({
                 owner: context.repo.owner,
                 repo: context.repo.repo,
                 run_id: ${{ github.run_id }}
             })
+            console.log(wf_run.data)
             console.log("get jobs for workflow run:", wf_run.data.jobs_url)
             const jobs_response = await github.request(wf_run.data.jobs_url)
-
             ////////////////////////////////////
             // build slack notification message
             ////////////////////////////////////
-
             // some utility functions
             var date_diff_func = function(start, end) {
                 var duration = end - start
@@ -124,34 +123,55 @@ jobs:
             }
             var status_icon_func = function(s) {
                 switch (s) {
-                case "success":
+                case "w_success":
                     return ":white_check_mark:"
-                case "failure":
+                case "w_failure":
                     return ":no_entry:"
+                case "w_cancelled":
+                    return ":warning:"
+                case "success":
+                    return "\u2713"
+                case "failure":
+                    return "\u2717"
                 default:
-                    return ":z:"
+                    return "\u20e0"
                 }
             }
             const commit = "${{ github.sha }}".substr(0, 6)
-
+            var pr = ""
+            for (p of wf_run.data.pull_requests) {
+              pr += ",<"+ p.url + "|#" + p.number + ">"
+            }
+            if (pr != "") {
+              pr = "for " + pr.substr(1)
+            }
             // build the message
             var fields = []
-            var workflow_status = "success"
+            var is_wf_success = true
+            var is_wf_failure = false
             for (j of jobs_response.data.jobs) {
                 console.log(j.name, ":", j.status, j.conclusion, j.started_at, j.completed_at)
                 // ignore the current job running this script
                 if (j.status != "completed") {
                     continue
                 }
+                if (j.conclusion != "success") {
+                  is_wf_success = false
+                }
                 if (j.conclusion == "failure") {
-                    workflow_status = "failure"
+                  is_wf_failure = true
                 }
                 fields.push({
                     type: "mrkdwn",
-                    text: status_icon_func(j.conclusion) + " <" + j.html_url + "|*" + j.name + "*>\n   \u21b3 completed in " + date_diff_func(new Date(j.started_at), new Date(j.completed_at))
+                    text: status_icon_func(j.conclusion) + " <" + j.html_url + "|" + j.name + ">\n  \u21b3 completed in " + date_diff_func(new Date(j.started_at), new Date(j.completed_at))
                 })
             }
-
+            var workflow_status = "w_cancelled"
+            if (is_wf_success) {
+              workflow_status = "w_success"
+            } else if (is_wf_failure) {
+              workflow_status = "w_failure"
+            }
             var slack_msg = {
                 blocks: [
                     {
@@ -165,7 +185,7 @@ jobs:
                         type: "section",
                         text: {
                             type: "mrkdwn",
-                            text: status_icon_func(workflow_status) + " *${{ github.workflow }}*\nWorkflow run <" + wf_run.data.html_url + "|#${{ github.run_number }}> completed in " + date_diff_func(new Date(wf_run.data.created_at), new Date(wf_run.data.updated_at))
+                            text: status_icon_func(workflow_status) + " *${{ github.workflow }}* " + pr + "\nWorkflow run <" + wf_run.data.html_url + "|#${{ github.run_number }}> completed in " + date_diff_func(new Date(wf_run.data.created_at), new Date(wf_run.data.updated_at))
                         }
                     },
                     {

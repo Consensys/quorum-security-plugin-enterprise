@@ -1,7 +1,5 @@
 package main
 
-//go:generate go run -ldflags "${LD_FLAGS}" $GOFILE
-
 import (
 	"encoding/json"
 	"fmt"
