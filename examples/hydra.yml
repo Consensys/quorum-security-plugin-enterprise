@@ -1,0 +1,30 @@
+version: "3.6"
+
+services:
+  auth-server:
+    container_name: hydra-auth-server
+    hostname: hydra-auth-server
+    image: oryd/hydra:v1.3.2-alpine
+    ports:
+      - "4444:4444" # Public port
+      - "4445:4445" # Admin port
+    command:
+      serve all --dangerous-force-http
+    environment:
+      - URLS_SELF_ISSUER=https://goquorum.com/oauth/
+      - DSN=memory
+      - STRATEGIES_ACCESS_TOKEN=jwt
+    networks:
+      quorum-net:
+        aliases:
+          - hydra-auth-server
+    restart: unless-stopped
+  node0:
+    environment:
+      - SECURITY_CONFIG=/data/qdata/hydra-config.json
+  node1:
+    environment:
+      - SECURITY_CONFIG=/data/qdata/hydra-config.json
+  node2:
+    environment:
+      - SECURITY_CONFIG=/data/qdata/hydra-config.json

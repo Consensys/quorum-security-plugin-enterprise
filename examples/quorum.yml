@@ -1,0 +1,208 @@
+version: "3.6"
+x-quorum-def:
+  &quorum-def
+  restart: "no"
+  expose:
+    - 21000
+  healthcheck:
+    test: ["CMD", "nc", "-vz", "localhost", "8545"]
+    interval: 3s
+    timeout: 3s
+    retries: 10
+    start_period: 5s
+  entrypoint:
+    - /bin/sh
+    - -c
+    - |
+      UDS_WAIT=10
+      for i in $$(seq 1 100)
+      do
+        result=$$(wget --timeout $$UDS_WAIT -qO- --proxy off $$TXMANAGER_IP:9000/upcheck)
+        echo "$$result"
+        if [ -S $$PRIVATE_CONFIG ] && [ "I'm up!" = "$$result" ]; then
+          break
+        else
+          echo "Sleep $$UDS_WAIT seconds. Waiting for TxManager."
+          sleep $$UDS_WAIT
+        fi
+      done
+      echo "--> Reinitializing datadir"
+      rm -rf $$DDIR/geth
+      rm -rf $$DDIR/plugins
+      geth --datadir $$DDIR init $$DDIR/genesis.json
+      echo "--> Starting geth"
+      exec geth \
+        --identity Node$$NODE_ID \
+        --datadir $$DDIR \
+        --nodiscover \
+        --verbosity 5 \
+        --networkid 2192 \
+        --nodekeyhex $$NODEKEY_HEX \
+        --rpc \
+        --rpcaddr 0.0.0.0 \
+        --rpcport 8545 \
+        --rpcapi admin,db,eth,debug,miner,net,shh,txpool,personal,web3,quorum,istanbul \
+        --port 21000 \
+        --unlock 0 \
+        --password $$DDIR/password.txt \
+        --allow-insecure-unlock \
+        --plugins file://$$DDIR/plugins.json \
+         $$GETH_ARGS
+x-tx-manager-def:
+  &tx-manager-def
+  expose:
+    - 9000
+    - 9080
+  restart: "no"
+  healthcheck:
+    test: ["CMD-SHELL", "[ -S /data/tm/tm.ipc ] || exit 1"]
+    interval: 3s
+    timeout: 3s
+    retries: 20
+    start_period: 5s
+  entrypoint:
+    - /bin/sh
+    - -c
+    - |
+      rm -f /data/tm/*.ipc
+      exec java -Xms128M -Xmx128M \
+        -jar /tessera/tessera-app.jar \
+        --override jdbc.url="jdbc:h2:/data/tm/db;MODE=Oracle;TRACE_LEVEL_SYSTEM_OUT=0" \
+        --override serverConfigs[1].serverAddress="unix:/data/tm/tm.ipc" \
+        --override serverConfigs[2].sslConfig.serverKeyStore="/data/tm/serverKeyStore" \
+        --override serverConfigs[2].sslConfig.serverTrustStore="/data/tm/serverTrustStore" \
+        --override serverConfigs[2].sslConfig.knownClientsFile="/data/tm/knownClientsFile" \
+        --override serverConfigs[2].sslConfig.clientKeyStore="/data/tm/clientKeyStore" \
+        --override serverConfigs[2].sslConfig.clientTrustStore="/data/tm/clientTrustStore" \
+        --override serverConfigs[2].sslConfig.knownServersFile="/data/tm/knownServersFile" \
+        --configfile /data/tm/config.json
+services:
+  node0:
+    << : *quorum-def
+    image: quorumengineering/quorum:sec
+    container_name: quorum-node0
+    hostname: node0
+    ports:
+      - 22000:8545
+    volumes:
+      - quorum-vol0:/data
+      - ./node-0:/data/qdata
+      - ./tm-0:/data/tm
+    depends_on:
+      - tm0
+    networks:
+      quorum-net:
+        ipv4_address: 172.16.58.11
+        aliases:
+          - node0
+    environment:
+      - PRIVATE_CONFIG=/data/tm/tm.ipc
+      - GETH_ARGS=--istanbul.blockperiod 1 --syncmode full --mine --minerthreads 1
+      - TXMANAGER_IP=172.16.58.101
+      - NODE_ID=1
+      - DDIR=/data/qdata
+      - NODEKEY_HEX=c49d54d1cef9ab90a370ca9695824670288b97bdd246673e420b2169c2be7a8a
+  tm0:
+    << : *tx-manager-def
+    image: quorumengineering/tessera:0.10.3
+    container_name: quorum-tm0
+    hostname: txmanager0
+    ports:
+      - 9080:9080
+    volumes:
+      - quorum-vol0:/data
+      - ./tm-0:/data/tm
+    networks:
+      quorum-net:
+        ipv4_address: 172.16.58.101
+  node1:
+    << : *quorum-def
+    image: quorumengineering/quorum:sec
+    container_name: quorum-node1
+    hostname: node1
+    ports:
+      - 22001:8545
+    volumes:
+      - quorum-vol1:/data
+      - ./node-1:/data/qdata
+      - ./tm-1:/data/tm
+    depends_on:
+      - tm1
+    networks:
+      quorum-net:
+        ipv4_address: 172.16.58.12
+        aliases:
+          - node1
+    environment:
+      - PRIVATE_CONFIG=/data/tm/tm.ipc
+      - GETH_ARGS=--istanbul.blockperiod 1 --syncmode full --mine --minerthreads 1
+      - TXMANAGER_IP=172.16.58.102
+      - NODE_ID=2
+      - DDIR=/data/qdata
+      - NODEKEY_HEX=6a822990d8295ab9e77ec25825513fbc8e728157ffa20b1de2b87d5548070f43
+  tm1:
+    << : *tx-manager-def
+    image: quorumengineering/tessera:0.10.3
+    container_name: quorum-tm1
+    hostname: txmanager1
+    ports:
+      - 9081:9080
+    volumes:
+      - quorum-vol1:/data
+      - ./tm-1:/data/tm
+    networks:
+      quorum-net:
+        ipv4_address: 172.16.58.102
+  node2:
+    << : *quorum-def
+    image: quorumengineering/quorum:sec
+    container_name: quorum-node2
+    hostname: node2
+    ports:
+      - 22002:8545
+    volumes:
+      - quorum-vol2:/data
+      - ./node-2:/data/qdata
+      - ./tm-2:/data/tm
+    depends_on:
+      - tm2
+    networks:
+      quorum-net:
+        ipv4_address: 172.16.58.13
+        aliases:
+          - node2
+    environment:
+      - PRIVATE_CONFIG=/data/tm/tm.ipc
+      - GETH_ARGS=--istanbul.blockperiod 1 --syncmode full --mine --minerthreads 1
+      - TXMANAGER_IP=172.16.58.103
+      - NODE_ID=3
+      - DDIR=/data/qdata
+      - NODEKEY_HEX=c5127e8a3d98058182a2832846a1143fb7c75705bdecae0e2f04c9219bf9da23
+  tm2:
+    << : *tx-manager-def
+    image: quorumengineering/tessera:0.10.3
+    container_name: quorum-tm2
+    hostname: txmanager2
+    ports:
+      - 9082:9080
+    volumes:
+      - quorum-vol2:/data
+      - ./tm-2:/data/tm
+    networks:
+      quorum-net:
+        ipv4_address: 172.16.58.103
+networks:
+  quorum-net:
+    name: quorum-net
+    driver: bridge
+    ipam:
+      driver: default
+      config:
+      - subnet: 172.16.58.0/24
+volumes:
+  "quorum-vol0":
+    name: quorum-vol0
+  "quorum-vol1":
+    name: quorum-vol1
+  "quorum-vol2":
+    name: quorum-vol2

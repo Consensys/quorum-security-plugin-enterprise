@@ -1,0 +1,51 @@
+{
+    "useWhiteList": false,
+    "jdbc": {
+        "username": "sa",
+        "password": "",
+        "url": "[TO BE OVERRIDREN FROM COMMAND LINE]",
+        "autoCreateTables": true
+    },
+    "serverConfigs":[
+        {
+            "app":"ThirdParty",
+            "enabled": true,
+            "serverAddress": "http://172.16.58.103:9080",
+            "communicationType" : "REST"
+        },
+        {
+            "app":"Q2T",
+            "enabled": true,
+            "serverAddress":"[TO BE OVERRIDDEN FROM COMMAND LINE]",
+            "communicationType" : "REST"
+        },
+        {
+            "app":"P2P",
+            "enabled": true,
+            "serverAddress":"http://172.16.58.103:9000",
+            "sslConfig": {
+              "tls": "OFF",
+              "generateKeyStoreIfNotExisted": true,
+              "serverKeyStore": "[TO BE OVERRIDREN FROM COMMAND LINE]",
+              "serverKeyStorePassword": "quorum",
+              "serverTrustStore": "[TO BE OVERRIDREN FROM COMMAND LINE]",
+              "serverTrustStorePassword": "quorum",
+              "serverTrustMode": "TOFU",
+              "knownClientsFile": "[TO BE OVERRIDREN FROM COMMAND LINE]",
+              "clientKeyStore": "[TO BE OVERRIDREN FROM COMMAND LINE]",
+              "clientKeyStorePassword": "quorum",
+              "clientTrustStore": "[TO BE OVERRIDREN FROM COMMAND LINE]",
+              "clientTrustStorePassword": "quorum",
+              "clientTrustMode": "TOFU",
+              "knownServersFile": "[TO BE OVERRIDREN FROM COMMAND LINE]"
+            },
+            "communicationType" : "REST"
+        }
+    ],
+    "peer": [{"url" : "http://172.16.58.101:9000"},{"url" : "http://172.16.58.102:9000"},{"url" : "http://172.16.58.103:9000"}],
+    "keys": {
+      "passwords": [],
+      "keyData": [{"config":{"data":{"bytes":"DYkdfImRqA4ZmYY4W82r9KpoZ9uXKIN6hlT66St6nww="},"type":"unlocked"},"publicKey":"82qRbaJsCyZOdyhf6zbCv/k+LitrVRq/W0wH/0uTAHk="}]
+    },
+    "alwaysSendTo": []
+}

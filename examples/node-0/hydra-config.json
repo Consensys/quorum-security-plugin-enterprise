@@ -6,10 +6,10 @@
   },
   "tokenValidation": {
     "issuers": [
-      "https://dev-318462.okta.com/oauth2/auszgaza2F3Tlc80i356"
+      "https://goquorum.com/oauth/"
     ],
     "jws": {
-      "endpoint": "https://dev-318462.okta.com/oauth2/auszgaza2F3Tlc80i356/v1/keys"
+      "endpoint": "http://hydra-auth-server:4444/.well-known/jwks.json"
     },
     "jwt": {
       "authorizationField": "scp",
