@@ -6,15 +6,15 @@
   },
   "tokenValidation": {
     "issuers": [
-      "https://dev-318462.okta.com/oauth2/auslzuia0ii0HycDg356"
+      "<issuer 3>"
     ],
     "introspect": {
-      "endpoint": "https://dev-318462.okta.com/oauth2/auslzuia0ii0HycDg356/v1/introspect",
+      "endpoint": "<introspection_endpoint 3>",
       "authentication": {
         "method": "client_secret_basic",
         "credentials": {
-          "clientId": "env://APP_CLIENT_ID_1",
-          "clientSecret": "env://APP_CLIENT_SECRET_1"
+          "clientId": "<app-plugin Client ID>",
+          "clientSecret": "<app-plugin Client Secret>"
         }
       }
     },

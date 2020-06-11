@@ -1,0 +1,25 @@
+{
+  "tls": {
+    "auto": true,
+    "certFile": "/tmp/cert.pem",
+    "keyFile": "/tmp/key.pem"
+  },
+  "tokenValidation": {
+    "issuers": [
+      "<issuer 2>"
+    ],
+    "introspect": {
+      "endpoint": "<introspection_endpoint 2>",
+      "authentication": {
+        "method": "client_secret_basic",
+        "credentials": {
+          "clientId": "<app-plugin Client ID>",
+          "clientSecret": "<app-plugin Client Secret>"
+        }
+      }
+    },
+    "jwt": {
+      "preferIntrospection": true
+    }
+  }
+}

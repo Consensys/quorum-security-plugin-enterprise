@@ -1,0 +1,19 @@
+{
+  "tls": {
+    "auto": true,
+    "certFile": "/tmp/cert.pem",
+    "keyFile": "/tmp/key.pem"
+  },
+  "tokenValidation": {
+    "issuers": [
+      "https://goquorum.com/oauth/"
+    ],
+    "jws": {
+      "endpoint": "http://hydra-auth-server:4444/.well-known/jwks.json"
+    },
+    "jwt": {
+      "authorizationField": "scp",
+      "preferIntrospection": false
+    }
+  }
+}

@@ -1,0 +1,14 @@
+version: "3.6"
+
+# okta-config.json is created manually from okta-config-template.json after placeholders are populated with values
+
+services:
+  node0:
+    environment:
+      - SECURITY_CONFIG=/data/qdata/okta-config.json
+  node1:
+    environment:
+      - SECURITY_CONFIG=/data/qdata/okta-config.json
+  node2:
+    environment:
+      - SECURITY_CONFIG=/data/qdata/okta-config.json
