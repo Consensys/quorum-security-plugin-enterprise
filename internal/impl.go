@@ -7,9 +7,9 @@ import (
 	"time"
 
 	"github.com/hashicorp/go-plugin"
-	"github.com/jpmorganchase/quorum-plugin-security/internal/config"
-	"github.com/jpmorganchase/quorum-plugin-security/internal/oauth2"
-	"github.com/jpmorganchase/quorum-plugin-security/internal/tls"
+	"github.com/jpmorganchase/quorum-security-plugin-enterprise/internal/config"
+	"github.com/jpmorganchase/quorum-security-plugin-enterprise/internal/oauth2"
+	"github.com/jpmorganchase/quorum-security-plugin-enterprise/internal/tls"
 	"github.com/jpmorganchase/quorum-security-plugin-sdk-go/proto"
 	"github.com/jpmorganchase/quorum-security-plugin-sdk-go/proto_common"
 	"google.golang.org/grpc"

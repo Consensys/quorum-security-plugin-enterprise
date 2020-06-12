@@ -8,7 +8,7 @@ import (
 	"path/filepath"
 	"testing"
 
-	"github.com/jpmorganchase/quorum-plugin-security/internal/config"
+	"github.com/jpmorganchase/quorum-security-plugin-enterprise/internal/config"
 	"github.com/jpmorganchase/quorum-security-plugin-sdk-go/proto"
 	"github.com/stretchr/testify/assert"
 )

@@ -1,8 +1,8 @@
 GIT_COMMIT := $(shell git rev-parse HEAD)
 GIT_BRANCH := $(shell git rev-parse --abbrev-ref HEAD)
 GIT_REPO := $(shell git ls-remote --get-url)
-EXECUTABLE := "quorum-plugin-security"
-PACKAGE ?= quorum-plugin-security
+EXECUTABLE := "quorum-security-plugin-enterprise"
+PACKAGE ?= quorum-security-plugin-enterprise
 OUTPUT_DIR := "$(shell pwd)/build"
 VERSION := "1.0.0"
 LD_FLAGS="-X main.GitCommit=${GIT_COMMIT} -X main.GitBranch=${GIT_BRANCH} -X main.GitRepo=${GIT_REPO} \

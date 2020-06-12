@@ -4,7 +4,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/jpmorganchase/quorum-plugin-security/internal/config"
+	"github.com/jpmorganchase/quorum-security-plugin-enterprise/internal/config"
 	testifyassert "github.com/stretchr/testify/assert"
 )
 

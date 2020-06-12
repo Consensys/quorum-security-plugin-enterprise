@@ -43,6 +43,10 @@ x-quorum-def:
         --rpcport 8545 \
         --rpcapi admin,db,eth,debug,miner,net,shh,txpool,personal,web3,quorum,istanbul \
         --port 21000 \
+        --ws \
+        --wsaddr 0.0.0.0 \
+        --wsport 8546 \
+        --wsapi admin,db,eth,debug,miner,net,shh,txpool,personal,web3,quorum,istanbul \
         --unlock 0 \
         --password $$DDIR/password.txt \
         --allow-insecure-unlock \

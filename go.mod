@@ -1,6 +1,4 @@
-module github.com/jpmorganchase/quorum-plugin-security
-
-replace github.com/jpmorganchase/quorum-security-plugin-sdk-go => github.com/QuorumEngineering/quorum-security-plugin-sdk-go v0.0.0-20200304163721-3a37bbb9bae0
+module github.com/jpmorganchase/quorum-security-plugin-enterprise
 
 require (
 	github.com/golang/protobuf v1.3.2
