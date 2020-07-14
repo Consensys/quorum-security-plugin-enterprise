@@ -6,8 +6,8 @@ to simplify the setup. Please make sure you have it installed.
 
 Clone this repo
 ```
-$ git clone https://github.com/jpmorganchase/quorum-plugin-security
-$ cd quorum-plugin-security/examples
+$ git clone https://github.com/jpmorganchase/quorum-security-plugin-enterprise
+$ cd quorum-security-plugin-enterprise/examples
 ```
 
 ## Using ORY Hydra

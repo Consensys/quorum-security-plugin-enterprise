@@ -5,7 +5,7 @@ import (
 	"os"
 
 	"github.com/hashicorp/go-plugin"
-	"github.com/jpmorganchase/quorum-plugin-security/internal"
+	"github.com/jpmorganchase/quorum-security-plugin-enterprise/internal"
 )
 
 func main() {

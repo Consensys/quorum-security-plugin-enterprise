@@ -9,8 +9,8 @@ import (
 	"unicode"
 
 	"github.com/golang/protobuf/ptypes"
-	"github.com/jpmorganchase/quorum-plugin-security/internal/config"
-	"github.com/jpmorganchase/quorum-plugin-security/internal/tls"
+	"github.com/jpmorganchase/quorum-security-plugin-enterprise/internal/config"
+	"github.com/jpmorganchase/quorum-security-plugin-enterprise/internal/tls"
 	"github.com/jpmorganchase/quorum-security-plugin-sdk-go/proto"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
