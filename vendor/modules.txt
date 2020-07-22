@@ -18,7 +18,7 @@ github.com/hashicorp/golang-lru
 github.com/hashicorp/golang-lru/simplelru
 # github.com/hashicorp/yamux v0.0.0-20180604194846-3520598351bb
 github.com/hashicorp/yamux
-# github.com/jpmorganchase/quorum-security-plugin-sdk-go v0.0.0-20200304163721-3a37bbb9bae0 => github.com/QuorumEngineering/quorum-security-plugin-sdk-go v0.0.0-20200304163721-3a37bbb9bae0
+# github.com/jpmorganchase/quorum-security-plugin-sdk-go v0.0.0-20200304163721-3a37bbb9bae0
 github.com/jpmorganchase/quorum-security-plugin-sdk-go/proto
 github.com/jpmorganchase/quorum-security-plugin-sdk-go/proto_common
 # github.com/mitchellh/go-testing-interface v0.0.0-20171004221916-a61a99592b77
