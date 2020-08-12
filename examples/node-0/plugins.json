@@ -2,7 +2,7 @@
   "providers": {
     "security": {
       "name":"quorum-security-plugin-enterprise",
-      "version":"0.1.0",
+      "version":"0.1.1",
       "config": "env://SECURITY_CONFIG?type=file"
     }
   }

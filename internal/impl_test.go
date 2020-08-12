@@ -4,9 +4,8 @@ import (
 	"context"
 	"testing"
 
-	"github.com/jpmorganchase/quorum-security-plugin-sdk-go/proto_common"
-
 	"github.com/jpmorganchase/quorum-security-plugin-sdk-go/proto"
+	"github.com/jpmorganchase/quorum-security-plugin-sdk-go/proto_common"
 	"github.com/stretchr/testify/assert"
 	"google.golang.org/grpc"
 )
@@ -40,7 +39,6 @@ func TestSecurityPluginImpl_Init(t *testing.T) {
 		HostIdentity: "node1",
 		RawConfiguration: []byte(`
 {
-  "enableMultiTenancyAuthz": true,
   "tls": {
     "auto": true
   },
@@ -61,7 +59,6 @@ func TestSecurityPluginImpl_Init(t *testing.T) {
 	assert.NotNil(t, testObject.tlsConfigSource, "tlsSource must be ready")
 	assert.NotNil(t, testObject.authManager, "authManager must be ready")
 	assert.Equal(t, "node1", testObject.config.TokenValidationConfig.Aud)
-
 }
 
 func TestSecurityPluginImpl_Get_whenNoTLSSource(t *testing.T) {

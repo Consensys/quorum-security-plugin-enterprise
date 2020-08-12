@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"log"
+	"reflect"
 	"time"
 
 	"github.com/hashicorp/go-plugin"
@@ -41,15 +42,22 @@ type SecurityPluginImpl struct {
 func (p *SecurityPluginImpl) Authenticate(ctx context.Context, req *proto.AuthenticationToken) (*proto.PreAuthenticatedAuthenticationToken, error) {
 	startTime := time.Now()
 	defer func() {
-		log.Println("[DEBUG] authenticate took", time.Now().Sub(startTime).Round(time.Microsecond))
+		log.Println("[DEBUG] authentication took", time.Now().Sub(startTime).Round(time.Microsecond))
 	}()
+	if p.authManager == nil || reflect.ValueOf(p.authManager).IsNil() {
+		// returning error code Unimplemented is the contract with Quorum
+		// so it knows this plugin is not configured to support authentication manager
+		return nil, status.Error(codes.Unimplemented, "no configuration")
+	}
 	return p.authManager.Authenticate(ctx, req)
 }
 
 // delegate call
 func (p *SecurityPluginImpl) Get(ctx context.Context, req *proto.TLSConfiguration_Request) (*proto.TLSConfiguration_Response, error) {
-	if p.tlsConfigSource == nil {
-		return nil, status.Error(codes.Unavailable, "no configuration")
+	if p.tlsConfigSource == nil || reflect.ValueOf(p.tlsConfigSource).IsNil() {
+		// returning error code Unimplemented is the contract with Quorum
+		// so it knows this plugin is not configured to support TLS configuration source
+		return nil, status.Error(codes.Unimplemented, "no configuration")
 	}
 	return p.tlsConfigSource.Get(ctx, req)
 }
@@ -71,7 +79,9 @@ func (p *SecurityPluginImpl) Init(ctx context.Context, req *proto_common.PluginI
 	if req.HostIdentity == "" {
 		return nil, status.Error(codes.InvalidArgument, "missing geth node name")
 	}
-	conf.TokenValidationConfig.Aud = req.HostIdentity
+	if conf.TokenValidationConfig != nil {
+		conf.TokenValidationConfig.Aud = req.HostIdentity
+	}
 	p.authManager, err = oauth2.NewManager(conf.TokenValidationConfig)
 	if err != nil {
 		return nil, status.Error(codes.InvalidArgument, err.Error())
@@ -81,10 +91,8 @@ func (p *SecurityPluginImpl) Init(ctx context.Context, req *proto_common.PluginI
 
 func (p *SecurityPluginImpl) GRPCServer(b *plugin.GRPCBroker, s *grpc.Server) error {
 	proto_common.RegisterPluginInitializerServer(s, p)
-	log.Println("[INFO] Register AuthenticationManager")
-	proto.RegisterAuthenticationManagerServer(s, p)
-	log.Println("[INFO] Register TLSConfigurationSourceServer")
 	proto.RegisterTLSConfigurationSourceServer(s, p)
+	proto.RegisterAuthenticationManagerServer(s, p)
 	return nil
 }
 
