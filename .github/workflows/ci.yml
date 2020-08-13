@@ -31,7 +31,7 @@ jobs:
     name: Notify Slack
     needs:
       - build
-    if: always()
+    if: always() && github.event_name != 'pull_request'
     runs-on: ubuntu-latest
     steps:
       - name: Prepare Slack message

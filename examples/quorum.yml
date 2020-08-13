@@ -83,7 +83,7 @@ x-tx-manager-def:
 services:
   node0:
     << : *quorum-def
-    image: quorumengineering/quorum:latest
+    image: ${QUORUM_DOCKER_IMAGE:-quorumengineering/quorum:latest}
     container_name: quorum-node0
     hostname: node0
     ports:
@@ -108,7 +108,7 @@ services:
       - NODEKEY_HEX=c49d54d1cef9ab90a370ca9695824670288b97bdd246673e420b2169c2be7a8a
   tm0:
     << : *tx-manager-def
-    image: quorumengineering/tessera:0.10.3
+    image: ${TESSERA_DOCKER_IMAGE:-quorumengineering/tessera:0.10.3}
     container_name: quorum-tm0
     hostname: txmanager0
     ports:
@@ -121,7 +121,7 @@ services:
         ipv4_address: 172.16.58.101
   node1:
     << : *quorum-def
-    image: quorumengineering/quorum:latest
+    image: ${QUORUM_DOCKER_IMAGE:-quorumengineering/quorum:latest}
     container_name: quorum-node1
     hostname: node1
     ports:
@@ -146,7 +146,7 @@ services:
       - NODEKEY_HEX=6a822990d8295ab9e77ec25825513fbc8e728157ffa20b1de2b87d5548070f43
   tm1:
     << : *tx-manager-def
-    image: quorumengineering/tessera:0.10.3
+    image: ${TESSERA_DOCKER_IMAGE:-quorumengineering/tessera:0.10.3}
     container_name: quorum-tm1
     hostname: txmanager1
     ports:
@@ -159,7 +159,7 @@ services:
         ipv4_address: 172.16.58.102
   node2:
     << : *quorum-def
-    image: quorumengineering/quorum:latest
+    image: ${QUORUM_DOCKER_IMAGE:-quorumengineering/quorum:latest}
     container_name: quorum-node2
     hostname: node2
     ports:
@@ -184,7 +184,7 @@ services:
       - NODEKEY_HEX=c5127e8a3d98058182a2832846a1143fb7c75705bdecae0e2f04c9219bf9da23
   tm2:
     << : *tx-manager-def
-    image: quorumengineering/tessera:0.10.3
+    image: ${TESSERA_DOCKER_IMAGE:-quorumengineering/tessera:0.10.3}
     container_name: quorum-tm2
     hostname: txmanager2
     ports:

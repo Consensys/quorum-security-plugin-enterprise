@@ -82,22 +82,23 @@ func NewSecurityConfiguration(rawJSON []byte) (*SecurityConfiguration, error) {
 
 // main configuration to protect JSON RPC server
 type SecurityConfiguration struct {
-	EnableMultiTenancyAuthz bool                          `json:"enableMultiTenancyAuthz"`
-	TLSConfig               *TLSConfiguration             `json:"tls"`
-	TokenValidationConfig   *TokenValidationConfiguration `json:"tokenValidation"`
+	TLSConfig             *TLSConfiguration             `json:"tls"`
+	TokenValidationConfig *TokenValidationConfiguration `json:"tokenValidation"`
 }
 
 func (c *SecurityConfiguration) validate() error {
-	if c.TokenValidationConfig == nil {
-		return fmt.Errorf("missing TokenValidation configuration")
+	if c.TokenValidationConfig == nil && c.TLSConfig == nil {
+		return fmt.Errorf("invalid configuration. 'tls' block and/or 'tokenValidation' block must be configured")
 	}
 	if c.TLSConfig != nil {
 		if err := c.TLSConfig.validate(); err != nil {
 			return err
 		}
 	}
-	if err := c.TokenValidationConfig.validate(); err != nil {
-		return err
+	if c.TokenValidationConfig != nil {
+		if err := c.TokenValidationConfig.validate(); err != nil {
+			return err
+		}
 	}
 	return nil
 }
@@ -106,7 +107,9 @@ func (c *SecurityConfiguration) SetDefaults() {
 	if c.TLSConfig != nil {
 		c.TLSConfig.setDefaults()
 	}
-	c.TokenValidationConfig.setDefaults()
+	if c.TokenValidationConfig != nil {
+		c.TokenValidationConfig.setDefaults()
+	}
 }
 
 func (cs CipherSuite) toUint16() (uint16, error) {

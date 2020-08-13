@@ -1,7 +1,9 @@
+# Quorum Enterprise Security Plugin
+
 This is to provide a backend support for `geth` JSON RPC servers by implementing services from [security plugin interface](https://github.com/jpmorganchase/quorum-plugin-definitions/blob/master/security.proto):
 
 - `TLSConfigurationSource` to provide TLS configuration for HTTP and WS RPC servers
-- `AuthenticationManager` to enable RPC servers being OAuth2-compliant resource servers 
+- `AuthenticationManager` to enable RPC servers being OAuth2-compliant resource servers
 that support both JSON Web Token ([JWT](https://tools.ietf.org/html/rfc7519)) and opaque access token format
 
 ## Prerequisites
@@ -17,7 +19,7 @@ $ PLUGIN_DIST_PATH=<path to store plugin distribution zip file> make dist
 
 ## Configuration
 
-Refer to the official documentation [here](http://docs.goquorum.com/en/latest/PluggableArchitecture/Plugins/security/implementation/) for more details
+Refer to the official documentation [here](http://docs.goquorum.com/en/latest/PluggableArchitecture/Plugins/security/For-Users/) for more details
 
 ## Token Validation
 

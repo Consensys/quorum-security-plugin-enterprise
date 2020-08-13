@@ -248,6 +248,47 @@ func TestNewSecurityConfiguration_whenValid(t *testing.T) {
 	assert.NoError(err)
 }
 
+func TestNewSecurityConfiguration_whenOnlyTLS(t *testing.T) {
+	assert := testifyassert.New(t)
+
+	config, err := NewSecurityConfiguration([]byte(onlyTLSConfiguration))
+
+	assert.NoError(err)
+	assert.Nil(config.TokenValidationConfig)
+	assert.NoError(config.validate())
+}
+
+func TestNewSecurityConfiguration_whenOnlyTokenValidation(t *testing.T) {
+	assert := testifyassert.New(t)
+
+	config, err := NewSecurityConfiguration([]byte(onlyTokenValidationConfiguration))
+
+	assert.NoError(err)
+	assert.Nil(config.TLSConfig)
+	assert.NoError(config.validate())
+}
+
+const onlyTLSConfiguration = `
+{
+  "tls": {
+    "auto": true
+  }
+}
+`
+
+const onlyTokenValidationConfiguration = `
+{
+  "tokenValidation": {
+    "jws": {
+      "endpoint": "https://localhost:5000/keys",
+      "tlsConnection": {
+        "insecureSkipVerify": true
+      }
+    }
+  }
+}
+`
+
 const minimumValidConfiguration = `
 {
   "tls": {

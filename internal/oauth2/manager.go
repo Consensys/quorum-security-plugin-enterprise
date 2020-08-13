@@ -27,6 +27,9 @@ type Manager struct {
 }
 
 func NewManager(conf *config.TokenValidationConfiguration) (*Manager, error) {
+	if conf == nil {
+		return nil, nil
+	}
 	m := &Manager{
 		config: conf,
 	}
