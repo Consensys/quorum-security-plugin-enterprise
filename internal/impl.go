@@ -76,10 +76,10 @@ func (p *SecurityPluginImpl) Init(ctx context.Context, req *proto_common.PluginI
 	if err != nil {
 		return nil, status.Error(codes.InvalidArgument, err.Error())
 	}
-	if req.HostIdentity == "" {
-		return nil, status.Error(codes.InvalidArgument, "missing geth node name")
-	}
 	if conf.TokenValidationConfig != nil {
+		if req.HostIdentity == "" {
+			return nil, status.Error(codes.InvalidArgument, "missing geth node name")
+		}
 		conf.TokenValidationConfig.Aud = req.HostIdentity
 	}
 	p.authManager, err = oauth2.NewManager(conf.TokenValidationConfig)

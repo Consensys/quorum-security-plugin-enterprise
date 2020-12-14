@@ -61,6 +61,71 @@ func TestSecurityPluginImpl_Init(t *testing.T) {
 	assert.Equal(t, "node1", testObject.config.TokenValidationConfig.Aud)
 }
 
+func TestSecurityPluginImpl_Init_TLSAndAuth_RequiresHostIdentity(t *testing.T) {
+	testObject := &SecurityPluginImpl{}
+
+	_, err := testObject.Init(context.Background(), &proto_common.PluginInitialization_Request{
+		RawConfiguration: []byte(`
+{
+  "tls": {
+    "auto": true
+  },
+  "tokenValidation": {
+    "jws": {
+      "endpoint": "https://localhost:5000/keys",
+      "tlsConnection": {
+        "insecureSkipVerify": true
+      }
+    }
+  }
+}
+`),
+	})
+
+	assert.EqualError(t, err, "rpc error: code = InvalidArgument desc = missing geth node name")
+}
+
+func TestSecurityPluginImpl_Init_TLSOnly_DoesNotRequireHostIdentity(t *testing.T) {
+	testObject := &SecurityPluginImpl{}
+
+	_, err := testObject.Init(context.Background(), &proto_common.PluginInitialization_Request{
+		RawConfiguration: []byte(`
+{
+  "tls": {
+    "auto": true
+  }
+}
+`),
+	})
+
+	assert.NoError(t, err)
+	assert.NotNil(t, testObject.config, "config must be ready")
+	assert.NotNil(t, testObject.tlsConfigSource, "tlsSource must be ready")
+	assert.Nil(t, testObject.authManager, "authManager should not be initialised")
+	assert.Nil(t, testObject.config.TokenValidationConfig, "authManager config should not be initialised")
+}
+
+func TestSecurityPluginImpl_Init_AuthOnly_RequiresHostIdentity(t *testing.T) {
+	testObject := &SecurityPluginImpl{}
+
+	_, err := testObject.Init(context.Background(), &proto_common.PluginInitialization_Request{
+		RawConfiguration: []byte(`
+{
+  "tokenValidation": {
+    "jws": {
+      "endpoint": "https://localhost:5000/keys",
+      "tlsConnection": {
+        "insecureSkipVerify": true
+      }
+    }
+  }
+}
+`),
+	})
+
+	assert.EqualError(t, err, "rpc error: code = InvalidArgument desc = missing geth node name")
+}
+
 func TestSecurityPluginImpl_Get_whenNoTLSSource(t *testing.T) {
 	testObject := &SecurityPluginImpl{
 		tlsConfigSource: nil,
