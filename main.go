@@ -4,8 +4,8 @@ import (
 	"log"
 	"os"
 
+	"github.com/consensys/quorum-security-plugin-enterprise/internal"
 	"github.com/hashicorp/go-plugin"
-	"github.com/jpmorganchase/quorum-security-plugin-enterprise/internal"
 )
 
 func main() {

@@ -6,7 +6,7 @@ to simplify the setup. Please make sure you have it installed.
 
 Clone this repo
 ```
-$ git clone https://github.com/jpmorganchase/quorum-security-plugin-enterprise
+$ git clone https://github.com/consensys/quorum-security-plugin-enterprise
 $ cd quorum-security-plugin-enterprise/examples
 ```
 

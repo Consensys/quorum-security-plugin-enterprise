@@ -25,7 +25,7 @@ fixfmt: tools
 	@goimports -w `find . -name '*.go' | grep -v vendor | grep -v proto`
 
 test: tools
-	@CGO_ENABLED=0 GOFLAGS="-mod=vendor" go test ./...
+	@CGO_ENABLED=0 go test ./...
 
 dist-local: clean build zip
 	@[ "${PLUGIN_DEST_PATH}" ] || ( echo "Please provide PLUGIN_DEST_PATH env variable" ; exit 1)
@@ -40,8 +40,8 @@ dist: clean build zip
 build: checkfmt
 	@mkdir -p ${OUTPUT_DIR}
 	@echo Output to ${OUTPUT_DIR}
-	@CGO_ENABLED=0 GOFLAGS="-mod=vendor" go run -ldflags=${LD_FLAGS} ./internal/metadata/gen.go
-	@CGO_ENABLED=0 GOFLAGS="-mod=vendor" gox \
+	@CGO_ENABLED=0 go run -ldflags=${LD_FLAGS} ./internal/metadata/gen.go
+	@CGO_ENABLED=0 gox \
 		-parallel=2 \
 		-os="${XC_OS}" \
 		-arch="${XC_ARCH}" \
@@ -52,8 +52,8 @@ build: checkfmt
 zip: build $(TARGET_DIRS)
 
 $(TARGET_DIRS):
-	@zip -j -FS -q ${OUTPUT_DIR}/$@/${PACKAGE}-${VERSION}.zip ${OUTPUT_DIR}/*.json ${OUTPUT_DIR}/$@/*
-	@shasum -a 256 ${OUTPUT_DIR}/$@/${PACKAGE}-${VERSION}.zip | awk '{print $$1}' > ${OUTPUT_DIR}/$@/${PACKAGE}-${VERSION}.zip.sha256sum
+	@zip -j -FS -q ${OUTPUT_DIR}/${PACKAGE}-${VERSION}-$@.zip ${OUTPUT_DIR}/*.json ${OUTPUT_DIR}/$@/*
+	@shasum -a 256 ${OUTPUT_DIR}/${PACKAGE}-${VERSION}-$@.zip | awk '{print $$1}' > ${OUTPUT_DIR}/${PACKAGE}-${VERSION}-$@-sha256.checksum
 
 tools: goimports gox
 

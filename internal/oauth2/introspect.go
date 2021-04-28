@@ -7,7 +7,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/jpmorganchase/quorum-security-plugin-enterprise/internal/config"
+	"github.com/consensys/quorum-security-plugin-enterprise/internal/config"
 	"github.com/jpmorganchase/quorum-security-plugin-sdk-go/proto"
 	"gopkg.in/square/go-jose.v2/jwt"
 )

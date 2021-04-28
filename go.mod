@@ -1,4 +1,4 @@
-module github.com/jpmorganchase/quorum-security-plugin-enterprise
+module github.com/consensys/quorum-security-plugin-enterprise
 
 require (
 	github.com/golang/protobuf v1.3.2
@@ -13,4 +13,4 @@ require (
 	gopkg.in/square/go-jose.v2 v2.3.1
 )
 
-go 1.13
+go 1.15

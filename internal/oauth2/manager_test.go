@@ -13,8 +13,8 @@ import (
 	"testing"
 	"time"
 
+	"github.com/consensys/quorum-security-plugin-enterprise/internal/config"
 	"github.com/golang/protobuf/ptypes"
-	"github.com/jpmorganchase/quorum-security-plugin-enterprise/internal/config"
 	"github.com/jpmorganchase/quorum-security-plugin-sdk-go/proto"
 	testifyassert "github.com/stretchr/testify/assert"
 	"gopkg.in/square/go-jose.v2"
