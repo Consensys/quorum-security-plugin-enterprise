@@ -20,7 +20,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/jpmorganchase/quorum-security-plugin-enterprise/internal/config"
+	"github.com/consensys/quorum-security-plugin-enterprise/internal/config"
 	"github.com/jpmorganchase/quorum-security-plugin-sdk-go/proto"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"

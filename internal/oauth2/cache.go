@@ -3,8 +3,8 @@ package oauth2
 import (
 	"time"
 
+	"github.com/consensys/quorum-security-plugin-enterprise/internal/config"
 	lru "github.com/hashicorp/golang-lru"
-	"github.com/jpmorganchase/quorum-security-plugin-enterprise/internal/config"
 )
 
 type cachedItem struct {

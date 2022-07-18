@@ -7,10 +7,10 @@ import (
 	"reflect"
 	"time"
 
+	"github.com/consensys/quorum-security-plugin-enterprise/internal/config"
+	"github.com/consensys/quorum-security-plugin-enterprise/internal/oauth2"
+	"github.com/consensys/quorum-security-plugin-enterprise/internal/tls"
 	"github.com/hashicorp/go-plugin"
-	"github.com/jpmorganchase/quorum-security-plugin-enterprise/internal/config"
-	"github.com/jpmorganchase/quorum-security-plugin-enterprise/internal/oauth2"
-	"github.com/jpmorganchase/quorum-security-plugin-enterprise/internal/tls"
 	"github.com/jpmorganchase/quorum-security-plugin-sdk-go/proto"
 	"github.com/jpmorganchase/quorum-security-plugin-sdk-go/proto_common"
 	"google.golang.org/grpc"
